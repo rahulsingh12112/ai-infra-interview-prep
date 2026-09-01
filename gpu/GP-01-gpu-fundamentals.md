@@ -63,3 +63,53 @@ Numbers GPU me alag precision me store hote: **FP32** (32-bit, full precision, a
 **Q: 13B model kitna VRAM?** — "13B × 2 bytes (FP16) = ~26GB inference. Ek 40GB A100 me fit. Training ~4x = ~100GB+ (multi-GPU)."
 
 **Q: FP16 vs INT8?** — "FP16 = 2 bytes, standard. INT8 = 1 byte, quantized, 2x less memory + faster, minor accuracy loss. Cost inference me INT8."
+
+---
+
+## 🎓 Deep Dive & Q&A (Teacher Session — extra clarity)
+
+> Yeh section un sawaalon/confusions ka nichod hai jo detailed teaching me clear hue. Doc ke short points ka "why-level" expansion — revision ke liye gold.
+
+### CPU vs GPU — asli why (sirf "parallel" nahi)
+- CPU = **latency-optimized** (ek kaam jitni jaldi ho khatam karo). GPU = **throughput-optimized** (total work-per-second max, chahe ek operation slow ho).
+- GPU ka doosra hidden weapon = **memory bandwidth** (A100 ~2 TB/s vs CPU RAM ~50-100 GB/s). "GPU fast" ka aadha reason cores, aadha bandwidth.
+- CPU parallelism = **task parallelism** (few cores, alag-alag kaam). GPU = **data parallelism / SIMD** (ek operation, hazaaron data points, ek saath).
+- **GPU weakness:** (1) sequential kaam (step 2 ko step 1 ka result chahiye — wait), (2) branchy/decision-heavy (if-else). Yeh CPU better. Example: DB query, OS, web server (sequential + branchy).
+- **Rule:** parallel + simple + independent = GPU. Sequential ya branchy = CPU.
+
+### Cores & memory — sharing model
+- **Core count per-GPU hota:** ek A100 ~7,000 CUDA cores. 8-GPU node = ~56,000 cores BUT **8 alag memory islands** (har GPU ki apni VRAM).
+- **Ek GPU ke andar** cores usi GPU ki VRAM (shared memory) se coordinate karte — CPU jaisa.
+- **Alag GPUs ke beech** shared memory NAHI — har GPU alag VRAM island. Data explicitly **NVLink/PCIe pe copy** hota (message-passing, shared memory nahi).
+- **CUDA cores** (general parallel workers) vs **Tensor cores** (matrix-multiply specialists, DL ke asli hero).
+- Multi-GPU speedup interconnect pe depend — heavy inter-worker dependency = communication-bound = **sublinear** (8 GPU ≠ 8x; kabhi 2-3x).
+
+### Model = numbers, CODE NAHI (badi clarity)
+- Model ek software/app **nahi** hai. Model = **numbers ki ek badi file** (jaise Excel with arabon cells), sirf data.
+- "7B model" = us bade formula me **7 arab numbers (parameters/weights)** bhare hain.
+- Formula soch: `output = (input × A) + B` — yahan A, B = parameters. Asli model me arabon aise numbers.
+- Yeh numbers **training** se aate (random se shuru, examples dekh ke adjust hote jab tak sahi na ho).
+- **"100GB model" = 100GB sirf numbers** (code/dependencies nahi). Code chhota (MB), CPU pe; numbers VRAM me.
+
+### VRAM me kya rehta (kitchen analogy)
+- **Weights** = recipe book (fixed gyaan, sabse bada hissa).
+- **Activations** = beech ke jhoothe bartan (temporary, aate-jaate).
+- **KV cache** = LLM ke likhe words ka running note (badhta jaata) — SERVING-time only.
+
+### Precision — number ki quality
+- FP32=4B (full detail), FP16/BF16=2B (half), INT8=1B (quantized), INT4=0.5B (aggressive).
+- Kam bytes = kam VRAM + faster + sasta, PAR accuracy thodi kam.
+- **BF16 vs FP16 (dono 2B):** BF16 ka **range bada** (FP32 jitna) → training-stable, overflow/NaN nahi. FP16 ka precision zyada par range chhota → training me overflow risk.
+  - **Training default = BF16** (stability). **Inference = FP16/BF16.** Cost inference = INT8.
+- **Quantize** = numbers ko lower precision me convert (FP16→INT8), VRAM aadha, minor accuracy loss. Model ka "compression."
+  - PTQ (post-training, fast) vs QAT (quantization-aware training, better accuracy, costly).
+
+### Q&A jo session me hue
+- **Q: 13B FP16 kitna VRAM, 24GB GPU me fit?** → 13×2 = 26GB. 24GB me **fit nahi** (2GB zyada). Options: INT8 quantize (13GB, fit + sasta — pehla choice) ya 2 GPU (mehenga + comm overhead — jab accuracy critical).
+- **Q: KV cache training ka hai ya serving ka?** → **Serving/inference** (text generation). Training ka NAHI. Training memory = weights+gradient+optimizer; serving memory = weights+KV cache.
+- **Q: KV cache full — doosre GPU me daal sakte?** → Seedha nahi (alag VRAM islands). Agar model tensor-parallel split hai toh cache bhi split. Warna scale-out (replicas + load balancer) ya PagedAttention. Dedicated offload possible par slow (last resort).
+
+### Interview reflexes (ratta)
+- **Inference VRAM** = params × bytes **+ 20-40% extra** (activations + KV cache). GPU thoda bada lo, tight nahi.
+- **Training VRAM** = params × bytes **× 4** (weights + gradient + optimizer). 4x hamesha **model/weights pe**, GPU capacity pe nahi.
+- 80GB model: inference ~1 GPU (tight), training ~4 GPU minimum, practically 6-8 (activations + overhead + safety margin).

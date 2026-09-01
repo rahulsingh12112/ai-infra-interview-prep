@@ -88,3 +88,57 @@ Architect decision: apna GPU infra (EC2/EKS with GPU) vs managed (SageMaker/Bedr
 **Q: Spot GPU kab?** — "Training (checkpoint se resume on interruption, 70-90% cheaper). Inference risky unless fault-tolerant."
 
 **Q: Self-host vs managed GPU?** — "Self-host (EKS GPU: cheaper at scale, control, ops burden) vs managed (SageMaker: less ops, premium). Volume + team decides."
+
+---
+
+## 🎓 Deep Dive & Q&A (Teacher Session — extra clarity)
+
+> Detailed teaching ke clarifications ka nichod. Tera FinOps/AWS maidan — yeh sabse strong.
+
+### AWS GPU instances — rule + mapping
+- **Rule: G = inference, P = training.**
+- G-family: g4dn (T4, cheapest), **g5 (A10G — inference sweet spot)**, g6 (L4, efficient).
+- P-family: p3 (V100, old), **p4d (A100, training workhorse)**, **p5 (H100, big LLM)**.
+- Custom: **inf2 (Inferentia — cheapest inference)**, trn1 (Trainium — training). Sasta par Neuron SDK, chhota ecosystem.
+- Mapping: T4→g4dn, A10G→g5, L4→g6, A100→p4d, H100→p5.
+
+### Cost reality (number-sense)
+- g5 ~$1-1.5/hr, p4d (8×A100) ~$32/hr, p5 (8×H100) ~$40/hr+.
+- p4d 5-din training ≈ $3,840/run. Ek always-on g5 endpoint 24/7 ≈ $1,000/mahina.
+- Cost optimization = architect ki #1 responsibility (₹1Cr role me expected).
+
+### 9 Cost Levers (ek saans me bolne layak)
+1. **Spot** (70-90% off, training/batch + checkpoint)
+2. **Right-size** (over-provision mat)
+3. **Autoscale + scale-to-zero** (inference, idle pe zero)
+4. **MIG** (GPU sharing)
+5. **Batching** (utilization)
+6. **Quantization** (sasta GPU — A100→A10)
+7. **Savings Plans** (steady inference, committed discount)
+8. **Inferentia/Trainium** (custom chips)
+9. **Monitoring** (Cost Explorer + tags + budgets/alerts)
+
+### Purchasing rule (interview me pakadte)
+- **Batch/training (interruptible) → Spot.** (Nightly batch = spot, on-demand NAHI — reflex banao.)
+- **Steady inference (24/7) → Reserved/Savings Plan.**
+- **Spike/experiment → On-demand.**
+- Networking: spot = burstable/opportunistic, reserved = committed circuit, on-demand = pay-as-you-go premium.
+
+### MIG vs time-slicing
+- **MIG** = ek A100/H100 ko **up to 7** isolated slices (dedicated memory + compute each). Ek slice doosre ko affect nahi. **Space-division.**
+- **Time-slicing** = poora GPU baari-baari (time-division), **no isolation** — heavy workload doosron ko slow kare.
+- MIG use: **multi-tenant** chhote models/light inference, har ko guaranteed isolated slice.
+- Networking: MIG = VLAN/dedicated circuit (isolated slice), time-slicing = shared best-effort medium.
+
+### GPU on EKS (5 cheezein)
+1. **GPU node groups** (g5/p4d, alag from CPU nodes)
+2. **NVIDIA device plugin** (GPU as schedulable resource `nvidia.com/gpu`)
+3. **Taints/tolerations** (GPU nodes pe taint → sirf GPU-tolerating pods; CPU pods GPU node waste na karein). = dedicated VLAN/QoS class.
+4. **Karpenter** (fast autoscale + cheapest fitting instance, idle → node hata)
+5. **MIG-aware scheduling** (har slice = allocatable GPU)
+
+### Build vs Buy (architect decision)
+- **Self-host (EKS/EC2 GPU):** sasta at steady scale + full control, PAR ops burden (drivers/CUDA/scaling/failures) — team chahiye.
+- **Managed (SageMaker/Bedrock):** kam ops + fast + auto-scale, PAR cost premium + kam control.
+- Rule: high steady volume + team → self-host; **variable/startup/small-team → managed** (no upfront GPU commitment, fast-to-market). Baad me steady ho toh self-host pe migrate.
+- On-prem: sirf extreme scale ya data-sensitive (capex).
