@@ -99,3 +99,39 @@ ML (especially LLM) GPU pe chalta. Samajhne layak: GPU CPU se parallel compute m
 **Q: Model deploy safely?** — "Canary (gradual), blue-green (instant rollback), shadow (zero-risk validate), A/B (metrics). Registry aliases."
 
 **Q: GPU cost kaise optimize?** — "Batching (utilization up), quantization (VRAM down), spot for training, serverless/autoscale for spiky inference, right-size."
+
+---
+
+## 🎓 Deep Dive & Q&A (Teacher Session — zero-se-expert, section-wise)
+
+> Live teaching ka nichod. GPU-MASTERY se overlap wale (training infra, GPU basics, serving) short; ML-specific naye concepts deep.
+
+### Section 1 — ML System vs Normal Software
+
+**Normal software:** logic **hardcoded** (programmer rules likhta — "agar age>18 allow"). Code hi sab.
+**ML system:** logic **data se seekha** (examples se pattern, hardcode nahi — spam detection ne khud seekha).
+
+**2 core differences (interview opening — structured 2 points do):**
+1. **Do phases (alag infra):** Training (data se seekhna — heavy GPU, batch, offline, ek-baar-ish) + Inference/Serving (predict — fast, real-time, scale, always-on). Beech me bridge (registry, deploy pipeline). Needs bilkul alag (GP-02: training=throughput/4x, inference=latency).
+2. **Code + Data + Model teeno manage** (normal = sirf code): data drift hota, model purana → retrain, sab versioning. Data pipelines + model lifecycle bhi design karna.
+   *(3rd valid difference: logic hardcoded vs data-learned. Koi bhi 2 labeled do.)*
+
+**Networking analogy:** Training = offline capacity planning/simulation (heavy, one-time). Inference = live packet forwarding (fast, continuous). Planning-plane vs forwarding-plane.
+
+**Interview one-liner:**
+> "Normal: logic hardcoded. ML: logic data se seekha → 2 phases (training heavy/offline + inference fast/real-time, alag infra + bridge) aur code+data+model teeno manage (drift, retrain, versioning)."
+
+**⚠️ STRUCTURE DRILL:** "2 differences batao" → EXACTLY 2 labeled (1)...(2)... do. Ek diya = adhoora. Number suno: "2 differences", "3 levers", "ek simple ek advanced" — utne hi, labeled.
+
+### Section 2 — Training Infrastructure (recap, GP-02 se deep already)
+
+- **Distributed:** data parallel (fit hai, speed — DDP), tensor (fit nahi — layer split, NVLink), pipeline (layers staged). Biggest LLM = 3D (DeepSpeed/Megatron).
+- **FSDP** (Fully Sharded Data Parallel) = data-parallel + model/optimizer states GPUs me shard (memory-saving jab model ek GPU me tight).
+- **Interconnect** (NVLink intra-node / InfiniBand inter-node) = bottleneck; slow → GPUs idle wait → **communication-bound**. Isliye fast link (idle avoid).
+- **Checkpointing** → S3, fail/spot-interruption pe resume; spot (70-90% off) safe.
+- **Orchestrate:** SageMaker Training, K8s jobs, AWS Batch.
+
+**Interview one-liner:**
+> "Training distributed: data (DDP), tensor/pipeline (big model), FSDP (sharded memory), 3D (DeepSpeed). Interconnect bottleneck → fast NVLink/InfiniBand so GPUs don't idle. Checkpoint→S3 for resume + spot saving."
+
+**Q&A:** 100B fit nahi → tensor+pipeline (+data=3D); interconnect matters kyunki slow link → GPUs idle wait (communication-bound) → NVLink/InfiniBand chahiye.

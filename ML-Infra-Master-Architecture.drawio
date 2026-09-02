@@ -1,0 +1,190 @@
+<mxfile host="app.diagrams.net" version="24.0.0">
+  <diagram name="ML-Infra-Master-Architecture" id="ml-infra-master">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ================= TITLE ================= -->
+        <mxCell id="title" value="AI/ML Infrastructure — Master End-to-End Architecture (Interview Prep)" style="text;html=1;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;fillColor=#0b5394;fontColor=#ffffff;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2320" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" value="Zones: 🌐 Traffic/Edge  |  🟢 Serving/Inference  |  🟣 GPU Compute  |  🟠 Storage  |  🔵 Data &amp; Feature  |  🔴 Training Pipeline  |  🟡 LLM/GenAI  |  ⚫ Monitoring/Ops   —   (docs: GP=GPU, SD=SystemDesign, LS=LLMServing, RAG, MLflow)" style="text;html=1;fontSize=12;align=center;verticalAlign=middle;fillColor=#f5f5f5;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="78" width="2320" height="28" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONE 1: TRAFFIC / EDGE ================= -->
+        <mxCell id="z-traffic" value="🌐 TRAFFIC / EDGE  (SD-01: CDN, LB, Caching)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="130" width="520" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="users" value="👥 Users / Clients&#10;(1M total → concurrent = QPS base)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="170" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cdn" value="CDN + Browser Cache&#10;(edge, static + cached responses)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="170" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="apigw" value="API Gateway / Ingress&#10;(auth, rate-limit, routing)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="260" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lb" value="⚖️ Load Balancer&#10;(least-conn for uneven LLM reqs;&#10;health checks → failover)&#10;≈ ECMP + BFD" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="260" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="⚡ Cache (Redis)&#10;exact-match + semantic&#10;(LLM prompt/response — big cost saver)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="360" width="450" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mq" value="📩 Message Queue (SQS/Kafka) — async: decoupling, load smoothing, reliability (batch/ingestion)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="435" width="450" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONE 2: SERVING / INFERENCE ================= -->
+        <mxCell id="z-serving" value="🟢 SERVING / INFERENCE  (SD-02, LS-01..05)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="600" y="130" width="640" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="serv-patterns" value="4 Serving Patterns (SD-02):&#10;• Online (real-time, latency — chat/fraud)&#10;• Batch (bulk offline, throughput — nightly)&#10;• Streaming (continuous, Kafka)&#10;• Serverless (spiky, scale-to-zero, cold-start)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=left;" vertex="1" parent="1">
+          <mxGeometry x="630" y="170" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="inf-servers" value="🖥️ Inference Servers (autoscaled, multi-AZ)&#10;vLLM / TGI / SageMaker endpoint&#10;• PagedAttention (KV cache mgmt)&#10;• Continuous batching (throughput)&#10;• Quantization (INT8 — cheaper GPU)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=left;" vertex="1" parent="1">
+          <mxGeometry x="940" y="170" width="280" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="autoscale" value="📈 Autoscaling + scale-to-zero&#10;(spike → add, off-peak → remove)&#10;⚠️ GPU billing = allocated time, NOT utilization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=left;" vertex="1" parent="1">
+          <mxGeometry x="630" y="310" width="290" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="deploy" value="🚀 Deployment Strategies (SD-02):&#10;Blue-Green (rollback), Canary (gradual),&#10;Shadow (zero-risk), A/B (metrics)&#10;≈ phased config rollout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=left;" vertex="1" parent="1">
+          <mxGeometry x="940" y="310" width="280" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ha" value="🛡️ HA: multi-AZ replicas + health-check failover + fallback (secondary/cached/graceful) — 3 pillars. SLA&gt;SLO&gt;SLI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=left;" vertex="1" parent="1">
+          <mxGeometry x="630" y="420" width="590" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONE 3: GPU COMPUTE ================= -->
+        <mxCell id="z-gpu" value="🟣 GPU COMPUTE  (GP-01..04)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="130" width="560" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="single-node" value="🔧 Single Node (intra-node)&#10;8 GPUs ↔ NVLink/NVSwitch (~900GB/s)&#10;• Cores per GPU ~7000 (CUDA + Tensor)&#10;• Each GPU own VRAM (memory island)&#10;• Tensor-parallel GPUs here (high comm)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="170" width="290" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="multi-node" value="🌐 Multi-Node (inter-node)&#10;Node ↔ Node via InfiniBand (RDMA)&#10;• Slow link → GPUs idle (comm-bound)&#10;• NCCL optimizes (all-reduce)&#10;• High-comm same node, minimize cross-node&#10;⭐ TERA NETWORKING EDGE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#9673a6;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1620" y="170" width="200" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="vram" value="🧮 VRAM Math: params × bytes (FP16=2)&#10;7B=14GB, 70B=140GB. Inference +20-40% (activations+KV). Training ×4 (weights+grad+optimizer, on MODEL not GPU)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="315" width="510" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="mig" value="🔀 MIG: 1 GPU → up to 7 isolated slices (dedicated mem+compute) ≈ VLAN. vs time-slicing (shared)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="395" width="510" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="aws-gpu" value="☁️ AWS: G-family (g4dn/g5/g6 — inference) | P-family (p4d/p5 — training) | Inferentia/Trainium (custom, cheap)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="448" width="510" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONE 4: STORAGE ================= -->
+        <mxCell id="z-storage" value="🟠 STORAGE  (SD-01 S8/S9)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1860" y="130" width="500" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" value="🪣 S3 (Object) — ML BACKBONE&#10;models, datasets, checkpoints, backups&#10;(bade binaries — DB me KABHI nahi)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="170" width="440" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ebs" value="💽 EBS (Block) — ek instance ki fast local disk (DB data, OS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="250" width="215" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="efs" value="📁 EFS (File) — shared FS, multiple instances mount (shared datasets) ≈ NFS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;" vertex="1" parent="1">
+          <mxGeometry x="2115" y="250" width="215" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="sqldb" value="🗄️ SQL DB (PostgreSQL)&#10;metadata/experiments (structured)&#10;replication=read-scale, sharding=write-scale" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="330" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="vectordb" value="🔎 Vector DB&#10;(pgvector/OpenSearch/Pinecone)&#10;embeddings — similarity search (RAG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;" vertex="1" parent="1">
+          <mxGeometry x="2115" y="330" width="215" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cap" value="⚖️ CAP: real-time features = strong consistency; metadata/analytics = eventual (≈ BGP convergence)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="420" width="440" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONE 5: DATA & FEATURE ================= -->
+        <mxCell id="z-data" value="🔵 DATA &amp; FEATURE  (SD-02 S4, RAG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="540" width="900" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="feature-store" value="🏪 Feature Store (SageMaker/Feast)&#10;• Offline (historical, training — S3/warehouse)&#10;• Online (low-latency serving — Redis/DynamoDB)&#10;⭐ Prevents TRAINING-SERVING SKEW (same feature both sides)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=left;" vertex="1" parent="1">
+          <mxGeometry x="70" y="580" width="400" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="rag-pipeline" value="📚 RAG Pipeline&#10;doc → chunk → embed → vector DB store&#10;query → embed → retrieve (top-k) → rerank&#10;→ context + prompt → LLM → answer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=left;" vertex="1" parent="1">
+          <mxGeometry x="500" y="580" width="410" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="data-ingest" value="🔄 Data Ingestion → Validation (quality) → Feature Engineering — feeds both training + serving" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=left;" vertex="1" parent="1">
+          <mxGeometry x="70" y="710" width="840" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONE 6: TRAINING PIPELINE ================= -->
+        <mxCell id="z-train" value="🔴 TRAINING PIPELINE  (SD-02 S5, GP-02, MLflow)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="980" y="540" width="860" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="train-compute" value="🏋️ Training Compute (GPU cluster)&#10;• Data / Tensor / Pipeline parallelism (3D)&#10;• DDP / FSDP / DeepSpeed / Megatron&#10;• Checkpointing → S3 (spot-safe, 70-90% off)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="580" width="380" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="experiment" value="📊 Experiment Tracking (MLflow)&#10;params, metrics, artifacts, autolog&#10;→ Evaluation (baseline gate)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="580" width="390" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="registry" value="📦 Model Registry (MLflow F09)&#10;versioned models + aliases (champion/challenger) → deployment trigger" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="700" width="380" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="orchestrate" value="⚙️ Orchestration (Airflow / SageMaker Pipelines / Kubeflow)&#10;ingest→validate→train→eval→register→deploy→monitor→retrain (automated loop)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1420" y="700" width="390" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONE 7: LLM / GENAI ================= -->
+        <mxCell id="z-llm" value="🟡 LLM / GenAI  (SD-03, LS, Bedrock) — aage padhna" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1860" y="540" width="500" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="bedrock" value="🤖 AWS Bedrock (managed)&#10;• Models (Claude etc.)&#10;• Agents, Guardrails, Knowledge Bases&#10;• ChatBedrockConverse (boto3)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="580" width="440" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="llm-serving" value="⚡ LLM Serving Deep (LS-02): vLLM&#10;PagedAttention, continuous batching, quantization, tensor-parallel" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="680" width="440" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="llm-patterns" value="🧩 Patterns: RAG, Agents (ReAct, tools), Prompt eng, LLM router, guardrails" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="760" width="440" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ================= ZONE 8: MONITORING / OPS ================= -->
+        <mxCell id="z-monitor" value="⚫ MONITORING / OPS  (SD-04 — aage padhna)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="870" width="2320" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="mon-metrics" value="📉 Metrics: latency (p50/p99), throughput (QPS), GPU util (nvidia-smi), error rate, cost/req" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="70" y="910" width="540" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="mon-drift" value="🌡️ Drift Detection: data drift + model drift → retrain trigger (closes pipeline loop)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="640" y="910" width="540" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="mon-cost" value="💰 Cost/FinOps: Cost Explorer + tags + budgets. Levers: spot, right-size, quantize, MIG, autoscale, cache, Savings Plans" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="910" width="560" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="mon-obs" value="🔍 Observability: logs, traces, dashboards (CloudWatch/Grafana) + alerts on SLO breach" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1800" y="910" width="530" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="mon-framework" value="🎯 INTERVIEW FRAMEWORK (SD-00): 1.Requirements+scale (concurrent users, QPS, latency, availability, cost)  2.High-level  3.Deep-dive+trade-offs  4.Bottleneck+failure    |    Question-type discipline: Design vs Cost vs Diagnose — jitna poocha utna, structured    |    Diagnose BEFORE fix" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="975" width="2260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ================= EDGES (flow) ================= -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#333333;" edge="1" parent="1" source="users" target="cdn"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#333333;" edge="1" parent="1" source="cdn" target="apigw"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#333333;" edge="1" parent="1" source="apigw" target="lb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#333333;" edge="1" parent="1" source="lb" target="inf-servers"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;strokeColor=#82b366;" edge="1" parent="1" source="lb" target="redis"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#9673a6;" edge="1" parent="1" source="inf-servers" target="single-node"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#9673a6;" edge="1" parent="1" source="single-node" target="multi-node"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;strokeColor=#6c8ebf;" edge="1" parent="1" source="inf-servers" target="feature-store"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;strokeColor=#6c8ebf;" edge="1" parent="1" source="inf-servers" target="rag-pipeline"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#6c8ebf;" edge="1" parent="1" source="rag-pipeline" target="vectordb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#b85450;" edge="1" parent="1" source="train-compute" target="experiment"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#b85450;" edge="1" parent="1" source="experiment" target="registry"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#b85450;" edge="1" parent="1" source="registry" target="deploy"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;strokeColor=#b85450;" edge="1" parent="1" source="train-compute" target="s3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;strokeColor=#666666;" edge="1" parent="1" source="inf-servers" target="mon-metrics"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;strokeColor=#666666;" edge="1" parent="1" source="mon-drift" target="orchestrate"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;strokeColor=#d6b656;" edge="1" parent="1" source="inf-servers" target="bedrock"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;dashed=1;strokeColor=#6c8ebf;" edge="1" parent="1" source="mq" target="data-ingest"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
