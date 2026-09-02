@@ -268,3 +268,123 @@ Teen tarah ka storage samajhna: **Block storage** (EBS — ek instance ko attach
 
 **Q&A hue:**
 - **Q: LLM requests uneven (100ms vs 10sec) — round-robin ya kuch aur?** → Least-connections/load-aware (round-robin lambi requests jam kar deta). Weighted tab jab servers bhi mixed-capacity. Networking: ECMP + load-aware routing + flow affinity.
+
+### Section 6 — Caching (bada cost + latency lever)
+
+**Problem:** Slow/mehenga kaam baar-baar (same LLM prompt 1000 baar = 1000 GPU calls). **Solution:** frequently-accessed data fast memory me → source hit bachao. Pehli baar compute+store, agli baar cache se seedha.
+
+**Key concepts:**
+- **Hit/miss** — cache me mila (fast) ya nahi (source hit).
+- **Eviction** — memory full, kya hataao? **LRU** (least recently used) common.
+- **TTL** — data kitni der valid (expire → refresh).
+- **Invalidation** — source badla → cache update ("hardest problem in CS").
+
+**Levels:** client, CDN (edge), **application cache (Redis/Memcached)**, DB cache.
+
+**⭐ ML caching (big cost lever):**
+- **LLM prompt/response cache** — same prompt → cached response, GPU call skip.
+- **Embedding cache**, **retrieval cache** (RAG).
+- LLM calls mehenge (GPU compute) → caching = paisa + latency saving.
+
+**⭐ Exact-match vs Semantic cache (LLM-specific):**
+- **Exact-match (simple):** bilkul same text → hit. Rigid — "return policy?" vs "wapsi policy" miss.
+- **Semantic (advanced):** query embedding + vector similarity → milte-julte prompts (same meaning, alag words) bhi hit. **Common-question workload ke liye best** (log alag shabdon me same poochte).
+
+**Networking analogy:** DNS caching / CDN edge caching — origin bachao. TTL = DNS TTL (same concept). Invalidation = stale entry / propagation delay.
+
+**Interview one-liner:**
+> "Cache frequently-accessed data in Redis — latency down, compute/backend load down. LLM prompt/response cache = repeated queries pe GPU call bachao (big cost+latency saver). Simple = exact-match, advanced = semantic (embedding similarity for same-meaning queries). LRU, TTL, invalidation. DNS/CDN caching jaisa."
+
+**Q&A hue:**
+- **Q: Common questions alag shabdon me — exact ya semantic cache?** → Semantic (meaning pakadta via embeddings; exact sirf identical text pe hit).
+
+**⚠️ COACHING NOTE (recurring gap):** Interview me "ek simple, ek advanced" poocha → EXACTLY 2 labeled do, concept-list mat dump karo. Sawaal parse → utne points → us structure me. Knowledge hone ke bawajood structure-miss = marks kat.
+
+### Section 7 — Message Queues & Async Processing
+
+**Sync (turant):** request → abhi process → jawab, user wait (chat).
+**Async (baad me):** request → turant ack → background me process (bulk docs). Iske liye **message queue**.
+
+**Message Queue (SQS/Kafka/RabbitMQ):** producer-consumer ke beech buffer.
+- **Producer** = kaam daale (queue me message). **Queue** = line me wait. **Consumer** = worker apni speed se uthake process.
+
+**3 benefits:**
+1. **Decoupling** — producer/consumer independent (ek badle, doosra affected nahi).
+2. **Load smoothing** — spike (10,000 req) → queue absorb, consumer steady rate → crash nahi.
+3. **Reliability** — consumer down → messages queue me safe, wapas aake process (kaam khoya nahi).
+
+**ML async:** batch inference, training jobs, doc ingestion (RAG: chunk+embed+store background).
+
+**Nuance (SQS vs Kafka):** SQS = simple queue (message uthao-process-delete). Kafka = stream/log (persist, multiple consumers replay, event streaming, high-throughput pipelines).
+
+**Networking analogy:** Queue = buffer/QoS queue (leaky/token bucket — burst absorb, steady drain). Decoupling = loosely coupled segments. Load smoothing = traffic shaping.
+
+**Interview one-liner:**
+> "Message queue decouples producer-consumer — producer daale, consumer apni speed. Benefits: decoupling, load smoothing (spike absorb), reliability (consumer down → safe). ML: batch inference, training, doc ingestion async. SQS (simple queue) vs Kafka (event stream). Buffer/QoS queue jaisa."
+
+**Q&A hue:**
+- **Q: RAG doc processing (30 sec/doc) — sync ya async?** → Async (SQS): user ko turant ack (30 sec wait bura UX), background process. Relevant benefit: load smoothing (many uploads → queue absorb, steady drain) + reliability (fail → safe retry). Networking: buffer/QoS.
+
+### Section 8 — Database Scaling
+
+**Problem:** Single DB slow/crash as data/traffic grows. 4 techniques:
+
+1. **Replication** — copies (1 primary for writes, N read replicas). **Read-scale + HA** (primary mara → replica promote). Writes still primary.
+2. **Sharding/Partitioning** — data tukdon me alag DBs (users A-M ek shard, N-Z doosra). **Write-scale**, par complex (cross-shard query mushkil).
+3. **Indexing** — fast lookup (bina index = full table scan). Query speed up.
+4. **SQL vs NoSQL** — SQL (PostgreSQL: structured, transactions, relations); NoSQL (DynamoDB: flexible, massive scale, high throughput).
+
+**⭐ read-scale vs write-scale:** Replication = READ-scale (copies, reads baanto). Sharding = WRITE-scale (data alag, writes baanto). Bahut reads → replication; bahut writes → sharding.
+
+**⭐ ML data → right store (GOLDEN RULE — interview me bahut aata):**
+| Data | Store | Kyun |
+|---|---|---|
+| Metadata (runs, metrics, params) | **SQL (PostgreSQL)** | STRUCTURED (rows/cols), MLflow backend |
+| Model/dataset files (GBs) | **S3 (object store)** | bade binaries — DB me KABHI nahi, sirf path DB me |
+| Embeddings/vectors | **Vector DB** (pgvector/OpenSearch/Pinecone) | similarity search |
+
+**⚠️ Common galti:** metadata "unstructured/NoSQL" NAHI — woh structured → SQL. 5GB model "SQL/NoSQL DB" me NAHI — S3. DB choice = data **size+type** se, na ki "trained/structured" assumption se. **Koi bada binary file DB me nahi jaata.**
+
+**Networking analogy:** Replication = config sync (HA + read distribute). Sharding = load-split across parallel paths. Read replica = anycast read nodes. Index = CAM/TCAM lookup (direct hit vs linear scan).
+
+**Interview one-liner:**
+> "DB scaling: replication (read-scale + HA), sharding (write-scale, complex), indexing (query speed), SQL (transactions) vs NoSQL (scale). ML: metadata SQL (MLflow/PostgreSQL), big files S3 (never DB), embeddings vector-DB. Right store per data type/size. Reads → replicas, writes → shards."
+
+**Q&A hue:**
+- **Q: (a) experiment metadata, (b) 5GB model files, (c) embeddings — kahan?** → (a) SQL/PostgreSQL (structured), (b) **S3** (bade binaries, DB me nahi), (c) vector DB. Reads zyada on metadata → read replicas.
+- **Q: 5GB trained model — SQL/NoSQL/S3?** → **S3** (bade binary DB me nahi, sirf path DB me).
+
+### Section 9 — Storage Types (ML me important)
+
+**Teen cloud storage types:**
+
+**1. Block (EBS)** — ek instance ko attached fast disk (laptop HDD jaisa). Use: DB data, OS, fast local. Limitation: ek instance se attached, fixed size.
+
+**2. Object (S3)** — objects/files, HTTP access. Unlimited, sasta, durable (11 nines), kahin se accessible. Use: **ML artifacts, datasets, model files, checkpoints, backups — ML backbone.** Limitation: filesystem nahi (get/put whole object, thodi latency).
+
+**3. File (EFS)** — shared filesystem, **multiple instances mount** karein (network drive). Use: shared datasets kai training instances padhein. 
+
+**Ek line farak:** EBS = ek instance ki personal fast disk; S3 = sabke liye unlimited sasta bucket (ML backbone); EFS = kai instances ka shared drive.
+
+**Quick decision:**
+- DB data / fast local → **EBS**
+- Models, datasets, checkpoints, backups → **S3**
+- Kai instances same data padhein → **EFS** (ya S3-source + local EBS cache for perf at scale)
+
+**Networking analogy:** S3 = network file server (HTTP, kahin se). EBS = local disk. EFS = **NFS share** (network mount, multiple clients).
+
+**Interview one-liner:**
+> "Block (EBS) = fast local disk for one instance (DB/OS). Object (S3) = unlimited/cheap/durable/HTTP — ML artifacts/datasets/models/checkpoints backbone. File (EFS) = shared filesystem multiple mount (shared datasets). S3 = ML backbone. NFS(EFS)/local-disk(EBS)/file-server(S3) jaisa."
+
+**Q&A hue:**
+- **Q: 8 instances shared dataset + checkpoints — kahan?** → Dataset: EFS (shared mount; scale pe S3-source + local EBS cache alt). Checkpoints: S3 (durable/cheap; spot/node fail → resume from last checkpoint, GP-02 pattern).
+
+---
+
+## ✅ SD-01 COMPLETE — Foundations mastered (teacher session)
+9 sections: Scalability, Latency/Throughput, Availability/HA, CAP, Load Balancing, Caching, Message Queues, DB Scaling, Storage. Har section why-level + networking analogy + Q&A.
+
+**Recurring interview gaps to drill (mock me):**
+1. **Question-type discipline** — jitna/jo poocha utna, us structure me (concept-dump nahi). "Ek simple ek advanced" = 2 labeled points.
+2. **Diagnose before fix** — ops sawaal me pehle "kya check", phir fix.
+3. **Base concepts** — bulk=throughput (not latency), spike=autoscale (not vertical), metadata=SQL, big-files=S3.
