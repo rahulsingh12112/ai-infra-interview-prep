@@ -135,3 +135,108 @@ ML (especially LLM) GPU pe chalta. Samajhne layak: GPU CPU se parallel compute m
 > "Training distributed: data (DDP), tensor/pipeline (big model), FSDP (sharded memory), 3D (DeepSpeed). Interconnect bottleneck → fast NVLink/InfiniBand so GPUs don't idle. Checkpoint→S3 for resume + spot saving."
 
 **Q&A:** 100B fit nahi → tensor+pipeline (+data=3D); interconnect matters kyunki slow link → GPUs idle wait (communication-bound) → NVLink/InfiniBand chahiye.
+
+### Section 3 — Inference / Serving Patterns (CORE — tera role)
+
+4 patterns:
+1. **Online (real-time)** — turant prediction, user waiting. Latency-critical (ms-sec). REST/gRPC + LB + autoscale. Chat, fraud. Sabse common.
+2. **Batch** — bulk predictions offline, no waiting. Throughput matter (not latency). Scheduled, results → DB. Nightly recommendations, 1 lakh docs.
+3. **Streaming** — continuous data stream pe predict (Kafka events, sensor/fraud stream).
+4. **Serverless** — spiky/unpredictable traffic. Scale-to-zero (idle=no cost), auto-scale on spike. Trade-off: **cold-start** (LLM: bada model load slow).
+
+**Decision:** Online (real-time/waiting), Batch (bulk/no-wait), Streaming (continuous flow), Serverless (spiky+cost). Factors: latency, traffic pattern, cost, model size.
+
+**⭐ Cold-start nuance:** Serverless + latency-sensitive = risky (pehla request slow). Fix: provisioned concurrency (kuch warm) ya baseline on-demand + serverless burst.
+
+**Networking analogy:** Online = live forwarding; batch = scheduled bulk transfer; streaming = continuous flow; serverless = on-demand capacity (scale-to-zero).
+
+**Interview one-liner:**
+> "4 patterns: online (real-time, latency — chat/fraud), batch (bulk offline, throughput — nightly), streaming (continuous Kafka), serverless (spiky, scale-to-zero, cold-start). Pattern = latency + traffic + cost + model-size."
+
+**Q&A:** (a) chatbot → Online, (b) nightly recommendations → Batch, (c) spiky+cost → Serverless (+ baseline/provisioned for cold-start).
+
+### Section 4 — Feature Store (ML-specific, naya)
+
+**Feature** = processed signal for model (raw data se compute — "avg txn amount last 30d", "logins today"). Model ko raw nahi, features chahiye.
+
+**Training-Serving Skew (problem):** feature training (historical) aur serving (real-time) me **alag compute** → mismatch → model production me galat (silent killer, debug mushkil — model sahi dikhta phir bhi galat).
+
+**Feature Store (solution):** central jagah, features compute+store, training aur serving **ek hi source** se → consistent, no skew.
+- **Offline store** — historical (training), S3/warehouse, batch.
+- **Online store** — same features, low-latency (serving), Redis/DynamoDB.
+- Both same definition → same feature dono jagah. Examples: SageMaker Feature Store, Feast.
+
+**Networking analogy:** central config/state DB (single source of truth) — jaise IPAM (sab same IP-data, koi alag record nahi → mismatch nahi).
+
+**Interview one-liner:**
+> "Feature store = central features, offline (training) + online (serving) same source — prevents training-serving skew (dono jagah alag compute = mismatch = galat prediction). SageMaker/Feast. Single-source-of-truth (IPAM jaisa)."
+
+**Q&A:** (1) Skew = feature training/serving alag compute → mismatch → wrong predictions. (2) Feature store = central, dono halves (offline+online) same definition → skew khatam.
+
+### Section 5 — ML Pipeline Architecture (End-to-End)
+
+**Key insight:** Production ML = automated **pipeline** (lifecycle), not just a model.
+
+**Stages (ORDER yaad rakh):**
+```
+1. Ingestion → 2. Validation (quality) → 3. Feature Engineering (→ feature store)
+→ 4. Training (MLflow track) → 5. Evaluation (baseline gate) → 6. Model Registry (versioned, champion/challenger)
+→ 7. Deployment (canary/blue-green) → 8. Monitoring
+   ↓ (drift detect → retrain trigger → wapas)
+```
+
+**⚠️ 2 common galti:**
+- **Drift ek STAGE nahi** — drift = monitoring ka OUTPUT/finding (data/model badal gaya).
+- **Registry deployment se PEHLE** (train → eval → register → deploy).
+
+**2 zaroori:**
+1. **Automated + orchestrated** (Airflow / SageMaker Pipelines / Kubeflow) — stage khatam → agla auto-trigger.
+2. **Gates** — evaluation baseline se accha nahi → auto-reject (deploy mat karo).
+
+**Monitoring loop:** drift (data drift / performance drop) detect → **retrain trigger** — kyunki data time se badalta, purana model stale, retrain se fresh. Yeh MLOps continuous loop.
+
+**Networking analogy:** IaC provisioning workflow — define → validate → apply → verify → monitor → drift pe re-provision. ML pipeline = same automation ("config"→"model", "drift"=data/model drift).
+
+**Interview one-liner:**
+> "Production ML = automated pipeline: ingest→validate→feature-engineer→train(track)→evaluate(gate)→register→deploy(canary)→monitor→drift→retrain(loop). Orchestrated (Airflow/SageMaker Pipelines). MLOps = ML+Ops (automated + monitored + retraining), not just a model. IaC provisioning jaisa."
+
+**Q&A:** Stages in order (drift NOT a stage — monitoring output). Registry before deployment. Monitoring drift → retrain trigger (data badalta, model stale → fresh rakhna).
+
+### Section 6 — Model Deployment Strategies [tera domain]
+
+**Problem:** Naya model deploy risky — galat model = bad predictions at scale. Safe strategies:
+
+1. **Blue-Green** — 2 envs (Blue=live, Green=naya ready). Test Green → saara traffic switch. Problem → instant wapas Blue. ➕ instant rollback ➖ double resource.
+2. **Canary** — naya % traffic pe (5%), monitor, gradual badhao (5→25→50→100). Problem → sirf chhota % affected. ➕ contained blast radius ➖ slow.
+3. **Shadow** — naya model real traffic pe chale par **output use nahi** (user ko purana answer); sirf record/compare. ➕ **zero user risk** ➖ double compute.
+4. **A/B Testing** — 2 models, traffic split (50-50), **business metrics** compare. ➕ business impact ➖ time for significance.
+
+**Kab kaunsa:** instant rollback → Blue-Green; gradual/contained → Canary; zero-risk validate → Shadow; business metric → A/B.
+
+**Registry aliases** (MLflow champion/challenger) enable yeh.
+
+**Networking analogy (EXACT domain):** Canary = phased config rollout (ek site try → sab). Blue-Green = standby switchover (HSRP). Shadow = traffic mirror/SPAN/tap (production unaffected). A/B = compare paths/policy on live.
+
+**Interview one-liner:**
+> "Safe deploy: blue-green (2 envs, switch, instant rollback), canary (small % → gradual, contained risk), shadow (real traffic, output unused — zero-risk validate), A/B (split, business metrics). Registry aliases enable. Networking: canary=phased rollout, blue-green=standby switchover, shadow=SPAN/mirror."
+
+**Q&A:** (a) validate on real traffic, zero user risk → **Shadow** (output unused, user gets old). (b) gradual so few affected → **Canary** (5%→...→100%, contained blast radius).
+
+### Section 7 — GPU Basics (recap, GP-01..04 me deep already)
+
+- GPU parallel-fast (matrix ops), mehenga + VRAM-limited.
+- VRAM math: params × bytes (FP16=2). 70B=140GB → multi-GPU.
+- Utilization maximize = cost (idle=waste) → batching.
+- Quantization (FP16/INT8) → chhota model, sasta GPU.
+- Model sharding (tensor/pipeline) → bade model multi-GPU.
+- K8s GPU: nvidia device plugin + GPU node pools.
+
+**Interview one-liner:**
+> "GPU parallel-fast, mehenga + VRAM-limited. Batching (utilization), quantization (footprint), sharding (big models). VRAM = params × bytes. K8s via device plugin + node pools." (Deep: GP-01..04)
+
+---
+
+## ✅ SD-02 COMPLETE (teacher session)
+7 sections: ML-vs-software, training infra (recap), serving patterns, feature store, ML pipeline, deployment strategies, GPU (recap). ML-specific concepts (feature store, skew, pipeline, deploy strategies) deep; GPU/training recap (GP-docs se).
+
+**Interview reflexes set:** serving pattern selection, training-serving skew + feature store, pipeline order (drift=monitoring output, registry before deploy), deployment strategies (shadow=zero-risk, canary=gradual).

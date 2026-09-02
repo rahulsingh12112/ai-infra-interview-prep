@@ -1,0 +1,151 @@
+<mxfile host="app.diagrams.net" version="24.0.0">
+  <diagram name="ML-Infra-Topology" id="ml-topology">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="AI/ML Inference Infrastructure — Realistic AWS Topology" style="text;html=1;fontSize=22;fontStyle=1;align=center;fillColor=#232f3e;fontColor=#ffffff;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="2520" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="user" value="👥 Users&#10;(Internet)&#10;concurrent = QPS base" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="380" width="150" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="cdn" value="🌐 CloudFront (CDN)&#10;edge cache + static&#10;+ cached LLM responses" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="250" y="375" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="r53" value="Route53 (DNS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="250" y="300" width="170" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="region" value="☁️ AWS Region (us-east-1)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#ff9900;strokeWidth=3;verticalAlign=top;fontStyle=1;fontSize=15;fontColor=#ff9900;" vertex="1" parent="1">
+          <mxGeometry x="470" y="100" width="1750" height="1120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3" value="🪣 S3 (Object Storage) — REGION LEVEL&#10;ML backbone: models, datasets, checkpoints, backups&#10;(accessible from all AZs / nodes via network)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontSize=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1660" y="140" width="520" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="vpc" value="🔒 VPC (10.0.0.0/16)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1565c0;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;fontColor=#1565c0;" vertex="1" parent="1">
+          <mxGeometry x="500" y="250" width="1690" height="820" as="geometry" />
+        </mxCell>
+
+        <mxCell id="alb" value="⚖️ Application Load Balancer&#10;least-connections (uneven LLM reqs) + health checks&#10;≈ ECMP + BFD failover" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="540" y="300" width="330" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="efs" value="📁 EFS (Shared File System) — VPC LEVEL&#10;multiple nodes mount (shared datasets) ≈ NFS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontSize=12;align=left;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="300" width="500" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="⚡ ElastiCache (Redis)&#10;exact + semantic cache&#10;(LLM prompt/response)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="900" y="300" width="230" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="az1" value="🏢 Availability Zone A (10.0.1.0/24)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#00897b;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#00897b;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="410" width="770" height="620" as="geometry" />
+        </mxCell>
+
+        <mxCell id="nodeA1" value="🖥️ GPU Node A1  (p4d.24xlarge — EC2)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;verticalAlign=top;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="570" y="450" width="700" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="gA1g0" value="GPU0&#10;A100&#10;80GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="500" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gA1g1" value="GPU1&#10;A100&#10;80GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="500" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gA1g2" value="GPU2&#10;A100&#10;80GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="920" y="500" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="gA1g3" value="GPU3&#10;A100&#10;80GB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="500" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="nvlinkA1lbl" value="↔ NVLink / NVSwitch (~900 GB/s) — intra-node, GPUs share here" style="text;html=1;fontSize=11;fontColor=#7b1fa2;fontStyle=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="600" y="590" width="570" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ebsA1" value="💽 EBS (per-node block disk — OS, local scratch)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="625" width="570" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="nodeA2" value="🖥️ GPU Node A2 (replica — HA)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;verticalAlign=top;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="570" y="710" width="700" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="gA2g0" value="GPU0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="600" y="750" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="gA2g1" value="GPU1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="760" y="750" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="gA2g2" value="GPU2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="920" y="750" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="gA2g3" value="GPU3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="750" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="nvlinkA2lbl" value="↔ NVLink (intra-node)" style="text;html=1;fontSize=10;fontColor=#7b1fa2;fontStyle=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="600" y="810" width="560" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="az2" value="🏢 Availability Zone B (10.0.2.0/24)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#00897b;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=13;fontColor=#00897b;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="410" width="460" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="nodeB1" value="🖥️ GPU Node B1 (p4d)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;verticalAlign=top;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="450" width="400" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="gB1g0" value="GPU0&#10;A100" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="500" width="80" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="gB1g1" value="GPU1&#10;A100" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="500" width="80" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="gB1g2" value="GPU2&#10;A100" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1600" y="500" width="80" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="gB1g3" value="GPU3&#10;A100" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="500" width="60" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="nvlinkB1lbl" value="↔ NVLink (intra-node)" style="text;html=1;fontSize=10;fontColor=#7b1fa2;fontStyle=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="580" width="360" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ebsB1" value="💽 EBS (per-node)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="615" width="360" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="az2note" value="(more replica nodes here for HA + autoscaling)" style="text;html=1;fontSize=11;fontStyle=2;align=center;fontColor=#00897b;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="720" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ib-lbl" value="═══ InfiniBand / EFA (RDMA, inter-node &amp; inter-AZ) — slow link → GPUs idle (comm-bound). NCCL optimizes (all-reduce). ⭐ TERA NETWORKING EDGE ═══" style="text;html=1;fontSize=12;fontStyle=1;align=center;fontColor=#c62828;" vertex="1" parent="1">
+          <mxGeometry x="560" y="880" width="1240" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="asg" value="📈 Auto Scaling Group + Karpenter (EKS) — spike→add nodes, off-peak→remove. GPU billing = allocated time (idle bhi bill). Deploy: blue-green/canary/shadow." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=11;align=left;" vertex="1" parent="1">
+          <mxGeometry x="540" y="930" width="1260" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="train" value="🔴 TRAINING (offline) — separate cluster/flow:  Data(S3) → Distributed train (data/tensor/pipeline parallel over NVLink+InfiniBand) → Checkpoints→S3 (spot-safe) → MLflow tracking → Model Registry → deploy to serving nodes above" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#c62828;fontSize=12;align=left;verticalAlign=middle;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="1005" width="1670" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="eu1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#333;" edge="1" parent="1" source="user" target="cdn"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eu2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#333;" edge="1" parent="1" source="cdn" target="alb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#e65100;" edge="1" parent="1" source="alb" target="nodeA1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#e65100;" edge="1" parent="1" source="alb" target="nodeA2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#e65100;" edge="1" parent="1" source="alb" target="nodeB1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="nv1" style="html=1;endArrow=none;strokeColor=#7b1fa2;strokeWidth=3;" edge="1" parent="1" source="gA1g0" target="gA1g1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="nv2" style="html=1;endArrow=none;strokeColor=#7b1fa2;strokeWidth=3;" edge="1" parent="1" source="gA1g1" target="gA1g2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="nv3" style="html=1;endArrow=none;strokeColor=#7b1fa2;strokeWidth=3;" edge="1" parent="1" source="gA1g2" target="gA1g3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="nvb1" style="html=1;endArrow=none;strokeColor=#7b1fa2;strokeWidth=3;" edge="1" parent="1" source="gB1g0" target="gB1g1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="nvb2" style="html=1;endArrow=none;strokeColor=#7b1fa2;strokeWidth=3;" edge="1" parent="1" source="gB1g1" target="gB1g2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="nvb3" style="html=1;endArrow=none;strokeColor=#7b1fa2;strokeWidth=3;" edge="1" parent="1" source="gB1g2" target="gB1g3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ib1" style="html=1;endArrow=none;strokeColor=#c62828;strokeWidth=4;dashed=1;" edge="1" parent="1" source="nodeA1" target="nodeB1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ib2" style="html=1;endArrow=none;strokeColor=#c62828;strokeWidth=4;dashed=1;" edge="1" parent="1" source="nodeA1" target="nodeA2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#2e7d32;dashed=1;" edge="1" parent="1" source="nodeA1" target="efs"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#2e7d32;dashed=1;" edge="1" parent="1" source="nodeB1" target="efs"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es3" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#2e7d32;dashed=1;" edge="1" parent="1" source="efs" target="s3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es4" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#2e7d32;dashed=1;" edge="1" parent="1" source="nodeA1" target="s3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ec1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;strokeColor=#e65100;dashed=1;" edge="1" parent="1" source="alb" target="redis"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
