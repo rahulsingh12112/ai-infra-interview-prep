@@ -1,0 +1,189 @@
+<mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1700" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <!-- ================= TITLE ================= -->
+    <mxCell id="title" value="AI/ML Inference Platform — End-to-End Flow (Interview Master Diagram)" style="text;html=1;fontSize=24;fontStyle=1;align=center;fillColor=#232f3e;fontColor=#ffffff;rounded=1;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="40" y="30" width="2320" height="55" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= BAND 1: REQUEST FLOW (y=140) ================= -->
+    <mxCell id="band1" value="① REQUEST FLOW  (concurrent users → QPS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="130" width="2320" height="150" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="users" value="👥 Users&#10;concurrent = QPS base&#10;(total ≠ concurrent)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="70" y="185" width="180" height="80" as="geometry"/>
+    </mxCell>
+    <mxCell id="cf" value="🌐 CloudFront (CDN)&#10;edge cache (static)&#10;user ke sabse paas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="440" y="185" width="180" height="80" as="geometry"/>
+    </mxCell>
+    <mxCell id="waf" value="🛡️ WAF&#10;bad traffic / patterns&#10;(SQLi, XSS, bad bots)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="810" y="185" width="180" height="80" as="geometry"/>
+    </mxCell>
+    <mxCell id="apigw" value="🚪 API Gateway&#10;AuthN + AuthZ&#10;+ rate limiting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1180" y="185" width="180" height="80" as="geometry"/>
+    </mxCell>
+    <mxCell id="guard" value="🚧 Guardrails&#10;input+output filter&#10;(injection, PII, toxic)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1550" y="185" width="180" height="80" as="geometry"/>
+    </mxCell>
+    <mxCell id="alb" value="⚖️ ALB&#10;least-connections&#10;+ health checks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1920" y="185" width="180" height="80" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= BAND 2: SERVING (y=320) ================= -->
+    <mxCell id="band2" value="② SERVING LAYER — GPU inference (vLLM), multi-AZ, autoscaled" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="320" width="1500" height="290" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="azA" value="🏢 Availability Zone A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=6;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="70" y="370" width="680" height="220" as="geometry"/>
+    </mxCell>
+    <mxCell id="nodeA1" value="🖥️ GPU Node A1 (p4d) — 4× A100 80GB, NVLink ~900GB/s" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+      <mxGeometry x="90" y="405" width="640" height="80" as="geometry"/>
+    </mxCell>
+    <mxCell id="gA0" value="GPU0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="110" y="440" width="120" height="35" as="geometry"/></mxCell>
+    <mxCell id="gA1" value="GPU1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="270" y="440" width="120" height="35" as="geometry"/></mxCell>
+    <mxCell id="gA2" value="GPU2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="430" y="440" width="120" height="35" as="geometry"/></mxCell>
+    <mxCell id="gA3" value="GPU3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="590" y="440" width="120" height="35" as="geometry"/></mxCell>
+    <mxCell id="nodeA2" value="🖥️ GPU Node A2 (replica — HA)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="90" y="505" width="640" height="65" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="azB" value="🏢 Availability Zone B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=6;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="790" y="370" width="720" height="220" as="geometry"/>
+    </mxCell>
+    <mxCell id="nodeB1" value="🖥️ GPU Node B1 (p4d) — 4× A100 80GB, NVLink" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;verticalAlign=top;spacingTop=4;" vertex="1" parent="1">
+      <mxGeometry x="810" y="405" width="680" height="80" as="geometry"/>
+    </mxCell>
+    <mxCell id="gB0" value="GPU0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="830" y="440" width="130" height="35" as="geometry"/></mxCell>
+    <mxCell id="gB1" value="GPU1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1000" y="440" width="130" height="35" as="geometry"/></mxCell>
+    <mxCell id="gB2" value="GPU2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1170" y="440" width="130" height="35" as="geometry"/></mxCell>
+    <mxCell id="gB3" value="GPU3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1340" y="440" width="130" height="35" as="geometry"/></mxCell>
+    <mxCell id="nodeB2" value="(+ more replica nodes — HA + autoscaling)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="810" y="505" width="680" height="65" as="geometry"/>
+    </mxCell>
+
+    <!-- interconnect note -->
+    <mxCell id="ib" value="═══ InfiniBand / EFA (RDMA) — inter-node &amp; inter-AZ. Slow link → GPU idle (comm-bound). NCCL optimizes all-reduce ═══" style="text;html=1;fontSize=11;fontStyle=2;align=center;fillColor=#fff2cc;strokeColor=#d6b656;rounded=1;" vertex="1" parent="1">
+      <mxGeometry x="70" y="575" width="1440" height="25" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= AUTOSCALE (right of serving) ================= -->
+    <mxCell id="autoscale" value="📈 Auto Scaling + Karpenter (EKS)&#10;&#10;• spike → add GPU nodes&#10;• off-peak → remove / scale-to-zero&#10;• GPU billing = ALLOCATED time&#10;  (idle bhi bill)&#10;• predictable peak → pre-scale&#10;• HPA (pods) + Karpenter (nodes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;verticalAlign=top;spacingTop=6;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="1580" y="320" width="360" height="290" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= MANAGED ALT (far right) ================= -->
+    <mxCell id="managed" value="🌎 Managed Alternative (Bedrock)&#10;&#10;Self-host (vLLM/EKS) vs Managed:&#10;• Managed: fast, low-ops, per-call$&#10;• Self-host: cheap@scale, control,&#10;  ops burden&#10;• low/spiky → managed&#10;• high-steady → self-host" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;verticalAlign=top;spacingTop=6;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="1980" y="320" width="380" height="290" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= BAND 3: DATA LAYER (y=650) ================= -->
+    <mxCell id="band3" value="③ DATA LAYER  (data type + size decides store)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f4ea;strokeColor=#82b366;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="650" width="2320" height="160" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="redis" value="⚡ ElastiCache (Redis)&#10;exact + SEMANTIC cache&#10;(LLM prompt/response)&#10;biggest cost saver" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="70" y="705" width="230" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="vectordb" value="🔎 Vector DB&#10;(OpenSearch/pgvector)&#10;embeddings — RAG&#10;sharded + replicated" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="530" y="705" width="230" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="rds" value="🗃️ RDS PostgreSQL&#10;metadata = STRUCTURED&#10;MLflow backend&#10;+ read replicas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="990" y="705" width="230" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="s3" value="🪣 S3 (Object Store)&#10;ML BACKBONE — big files&#10;models, datasets,&#10;checkpoints (never DB)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1450" y="705" width="230" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="efsebs" value="📁 EFS (shared mount)&#10;💽 EBS (per-node disk)&#10;EFS = shared datasets&#10;EBS = OS / local scratch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="1910" y="705" width="230" height="90" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= BAND 4: OBSERVABILITY (y=850) ================= -->
+    <mxCell id="band4" value="④ OBSERVABILITY  (uptime kaafi nahi — prediction quality track)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3edf7;strokeColor=#9673a6;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="850" width="1500" height="150" as="geometry"/>
+    </mxCell>
+    <mxCell id="infra" value="Layer 1: INFRA&#10;GPU util, latency,&#10;throughput&#10;(Prometheus/CloudWatch)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="70" y="900" width="330" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="modelperf" value="Layer 2: MODEL PERF&#10;accuracy, prediction dist.&#10;⚠️ SILENT DEGRADATION&#10;(actuals delayed → pred-dist)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="440" y="900" width="330" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="dataq" value="Layer 3: DATA QUALITY&#10;input distribution shift?&#10;(data drift signal)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="810" y="900" width="330" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="traces" value="TRACES (3rd pillar)&#10;request journey per-step&#10;(RAG/agent)&#10;OpenTelemetry / X-Ray" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1180" y="900" width="330" height="85" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= BAND 5: MLOPS LOOP (y=1040) ================= -->
+    <mxCell id="band5" value="⑤ MLOps LOOP  (drift = monitoring OUTPUT, not a stage · registry BEFORE deploy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdf0e6;strokeColor=#d79b00;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="1040" width="2320" height="150" as="geometry"/>
+    </mxCell>
+    <mxCell id="drift" value="🚨 Drift Detect&#10;(Evidently)&#10;data P(X) / concept P(Y|X)&#10;⚠️ seasonality ≠ drift" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="70" y="1090" width="250" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="train2" value="⚙️ Retrain&#10;(triggered by drift)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="480" y="1090" width="250" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="eval" value="✅ Evaluate (GATE)&#10;baseline se accha?&#10;nahi → auto-reject" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="890" y="1090" width="250" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="registry" value="📚 Model Registry&#10;versioned&#10;champion/challenger&#10;(BEFORE deploy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1300" y="1090" width="250" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="deploy" value="🚀 Deploy&#10;canary / blue-green /&#10;shadow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="1710" y="1090" width="250" height="85" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= BAND 6: TRAINING + SQS (y=1230) ================= -->
+    <mxCell id="band6" value="⑥ TRAINING (offline) + ASYNC  (heavy/batch/throughput — separate from serving)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fde8e8;strokeColor=#b85450;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="1230" width="2320" height="150" as="geometry"/>
+    </mxCell>
+    <mxCell id="trainflow" value="🔴 TRAINING FLOW:  Data (S3) → Distributed train (data/tensor/pipeline parallel over NVLink+InfiniBand) → Checkpoints → S3 (spot-safe, resume) → MLflow tracking → Model Registry → deploy to serving" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="70" y="1285" width="1500" height="75" as="geometry"/>
+    </mxCell>
+    <mxCell id="sqs" value="📥 SQS / Kafka (async)&#10;producer → queue → worker&#10;• decouple&#10;• load smoothing (spike)&#10;• reliability (worker down = safe)&#10;use: doc ingestion, batch jobs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="1610" y="1285" width="350" height="75" as="geometry"/>
+    </mxCell>
+
+    <!-- ================= EDGES: request flow ================= -->
+    <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="users" target="cf"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="cf" target="waf"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="waf" target="apigw"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="apigw" target="guard"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="guard" target="alb"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ALB -> serving -->
+    <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#e65100;strokeWidth=2;" edge="1" parent="1" source="alb" target="nodeA1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#e65100;strokeWidth=2;" edge="1" parent="1" source="alb" target="nodeB1"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- ALB -> redis cache -->
+    <mxCell id="e8" value="cache check" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#82b366;dashed=1;fontSize=10;" edge="1" parent="1" source="alb" target="redis"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <!-- serving -> vector db (RAG) -->
+    <mxCell id="e9" value="retrieve top-k (RAG)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#82b366;dashed=1;fontSize=10;" edge="1" parent="1" source="nodeA1" target="vectordb"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <!-- serving -> s3 (model load) -->
+    <mxCell id="e10" value="model load" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#82b366;dashed=1;fontSize=10;" edge="1" parent="1" source="nodeB1" target="s3"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- serving -> observability -->
+    <mxCell id="e11" value="metrics/traces" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#9673a6;dashed=1;fontSize=10;" edge="1" parent="1" source="nodeA2" target="infra"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- observability -> drift -->
+    <mxCell id="e12" value="signals" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;dashed=1;fontSize=10;" edge="1" parent="1" source="modelperf" target="drift"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- mlops loop chain -->
+    <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1" source="drift" target="train2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1" source="train2" target="eval"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1" source="eval" target="registry"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1" source="registry" target="deploy"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- deploy -> serving (loop back up) -->
+    <mxCell id="e17" value="deploy new model → serving" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;dashed=1;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="deploy" target="nodeB2"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+    <!-- training -> registry -->
+    <mxCell id="e18" value="register" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#b85450;dashed=1;fontSize=10;" edge="1" parent="1" source="trainflow" target="registry"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+  </root>
+</mxGraphModel>

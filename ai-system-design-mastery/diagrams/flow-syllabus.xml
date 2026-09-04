@@ -1,0 +1,132 @@
+<mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2500" pageHeight="1900" math="0" shadow="0">
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+
+    <mxCell id="title" value="AI/ML Platform — FLOW + Syllabus Topics Mapped (kaunsa topic flow me kahan)" style="text;html=1;fontSize=23;fontStyle=1;align=center;fillColor=#232f3e;fontColor=#ffffff;rounded=1;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="40" y="25" width="2420" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="legend" value="Grey tag = us box se related SYLLABUS TOPICS (module.number)" style="text;html=1;fontSize=12;fontStyle=2;align=center;fillColor=#f5f5f5;strokeColor=#999;rounded=1;" vertex="1" parent="1">
+      <mxGeometry x="40" y="82" width="2420" height="26" as="geometry"/>
+    </mxCell>
+
+    <!-- ===== BAND 1: REQUEST FLOW ===== -->
+    <mxCell id="band1" value="① REQUEST FLOW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="125" width="2420" height="180" as="geometry"/>
+    </mxCell>
+
+    <mxCell id="users" value="👥 Users&#10;concurrent=QPS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1"><mxGeometry x="70" y="170" width="170" height="60" as="geometry"/></mxCell>
+    <mxCell id="users_t" value="📘1.1 Scalability · 1.2 Latency/Throughput · 📔7.2 Estimation (QPS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="70" y="235" width="170" height="55" as="geometry"/></mxCell>
+
+    <mxCell id="cf" value="🌐 CloudFront&#10;(CDN edge)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1"><mxGeometry x="450" y="170" width="170" height="60" as="geometry"/></mxCell>
+    <mxCell id="cf_t" value="📘1.6 Caching (edge, static) · 5H Networking (CloudFront)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="450" y="235" width="170" height="55" as="geometry"/></mxCell>
+
+    <mxCell id="waf" value="🛡️ WAF" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1"><mxGeometry x="830" y="170" width="170" height="60" as="geometry"/></mxCell>
+    <mxCell id="waf_t" value="📕4.3 Security (defense-in-depth) · 5H WAF" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="830" y="235" width="170" height="55" as="geometry"/></mxCell>
+
+    <mxCell id="apigw" value="🚪 API Gateway&#10;AuthN/AuthZ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1210" y="170" width="170" height="60" as="geometry"/></mxCell>
+    <mxCell id="apigw_t" value="📕4.3 Security (IAM/authz) · 5H Cognito/IAM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="1210" y="235" width="170" height="55" as="geometry"/></mxCell>
+
+    <mxCell id="guard" value="🚧 Guardrails" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1590" y="170" width="170" height="60" as="geometry"/></mxCell>
+    <mxCell id="guard_t" value="📕4.3 LLM threats (injection/PII) · 📙3.7 Bedrock Guardrails" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="1590" y="235" width="170" height="55" as="geometry"/></mxCell>
+
+    <mxCell id="alb" value="⚖️ ALB&#10;least-conn" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1"><mxGeometry x="1970" y="170" width="170" height="60" as="geometry"/></mxCell>
+    <mxCell id="alb_t" value="📘1.5 Load Balancing · 1.3 HA (health check) · 5B Ingress→ALB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="1970" y="235" width="170" height="55" as="geometry"/></mxCell>
+
+    <!-- ===== BAND 2: SERVING ===== -->
+    <mxCell id="band2" value="② SERVING LAYER — GPU inference (vLLM), multi-AZ, autoscaled" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="325" width="1560" height="290" as="geometry"/>
+    </mxCell>
+    <mxCell id="azA" value="🏢 AZ-A" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;dashed=1;" vertex="1" parent="1"><mxGeometry x="70" y="365" width="710" height="235" as="geometry"/></mxCell>
+    <mxCell id="nodeA1" value="🖥️ GPU Node A1 (p4d) — 4× A100 80GB · NVLink ~900GB/s" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="90" y="400" width="670" height="55" as="geometry"/></mxCell>
+    <mxCell id="gA0" value="GPU0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="110" y="465" width="140" height="30" as="geometry"/></mxCell>
+    <mxCell id="gA1" value="GPU1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="290" y="465" width="140" height="30" as="geometry"/></mxCell>
+    <mxCell id="gA2" value="GPU2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="470" y="465" width="140" height="30" as="geometry"/></mxCell>
+    <mxCell id="gA3" value="GPU3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="620" y="465" width="130" height="30" as="geometry"/></mxCell>
+    <mxCell id="nodeA2" value="🖥️ GPU Node A2 (replica — HA)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="90" y="505" width="670" height="40" as="geometry"/></mxCell>
+    <mxCell id="serv_t" value="📗2.2 Training infra · 2.7 GPU (VRAM math) · 📙3.1 LLM serving · 3.2 vLLM (PagedAttn/batching) · 3.3 Inference optim · 🛠️5C GPU-on-K8s (device plugin/MIG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;align=left;spacingLeft=6;verticalAlign=top;spacingTop=4;" vertex="1" parent="1"><mxGeometry x="90" y="550" width="710" height="45" as="geometry"/></mxCell>
+
+    <mxCell id="azB" value="🏢 AZ-B" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=4;dashed=1;" vertex="1" parent="1"><mxGeometry x="820" y="365" width="740" height="235" as="geometry"/></mxCell>
+    <mxCell id="nodeB1" value="🖥️ GPU Node B1 (p4d) — 4× A100 · NVLink" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="840" y="400" width="700" height="55" as="geometry"/></mxCell>
+    <mxCell id="gB0" value="GPU0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="860" y="465" width="150" height="30" as="geometry"/></mxCell>
+    <mxCell id="gB1" value="GPU1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="1040" y="465" width="150" height="30" as="geometry"/></mxCell>
+    <mxCell id="gB2" value="GPU2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="1220" y="465" width="150" height="30" as="geometry"/></mxCell>
+    <mxCell id="gB3" value="GPU3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0b3e0;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="1400" y="465" width="140" height="30" as="geometry"/></mxCell>
+    <mxCell id="nodeB2" value="(+ more replicas — HA + autoscaling)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="840" y="505" width="700" height="40" as="geometry"/></mxCell>
+    <mxCell id="ib" value="═══ InfiniBand/EFA (RDMA) — inter-node/AZ · slow→GPU idle (comm-bound) · NCCL ═══  [📗2.2 interconnect]" style="text;html=1;fontSize=10;fontStyle=2;align=center;fillColor=#fff2cc;strokeColor=#d6b656;rounded=1;" vertex="1" parent="1"><mxGeometry x="840" y="552" width="700" height="42" as="geometry"/></mxCell>
+
+    <!-- autoscale + managed (right) -->
+    <mxCell id="autoscale" value="📈 Auto Scaling + Karpenter&#10;• spike→add, off-peak→remove&#10;• GPU billing=allocated time&#10;• HPA+Karpenter, scale-to-zero&#10;&#10;[📘1.1 · 📕4.5 FinOps ·&#10; 🛠️5D HPA/VPA/CA/Karpenter/KEDA]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="1640" y="325" width="380" height="290" as="geometry"/></mxCell>
+    <mxCell id="managed" value="🌎 Managed Alt (Bedrock)&#10;self-host vs managed trade-off&#10;• low/spiky→managed&#10;• high-steady→self-host&#10;&#10;[📙3.7 Bedrock · 3.6 cost ·&#10; 🛠️5E EKS/ECS/Lambda choice]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="2060" y="325" width="400" height="290" as="geometry"/></mxCell>
+
+    <!-- ===== BAND 3: DATA ===== -->
+    <mxCell id="band3" value="③ DATA LAYER — data type + size decides store  [📘1.8 DB Scaling · 1.9 Storage · 🛠️5H DB/Storage]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f4ea;strokeColor=#82b366;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="640" width="2420" height="180" as="geometry"/>
+    </mxCell>
+    <mxCell id="redis" value="⚡ ElastiCache (Redis)&#10;exact+SEMANTIC cache" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1"><mxGeometry x="70" y="695" width="250" height="60" as="geometry"/></mxCell>
+    <mxCell id="redis_t" value="📘1.6 Caching · 📙3.6 semantic cache" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="70" y="760" width="250" height="45" as="geometry"/></mxCell>
+    <mxCell id="vectordb" value="🔎 Vector DB&#10;embeddings (RAG)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1"><mxGeometry x="540" y="695" width="250" height="60" as="geometry"/></mxCell>
+    <mxCell id="vectordb_t" value="📙3.4 RAG (retrieve/rerank) · 🛠️5H OpenSearch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="540" y="760" width="250" height="45" as="geometry"/></mxCell>
+    <mxCell id="rds" value="🗃️ RDS PostgreSQL&#10;metadata (SQL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1010" y="695" width="250" height="60" as="geometry"/></mxCell>
+    <mxCell id="rds_t" value="📘1.4 CAP (strong/eventual) · 1.8 replication/shard · 📗2.4 Feature Store" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="1010" y="760" width="250" height="45" as="geometry"/></mxCell>
+    <mxCell id="s3" value="🪣 S3 (Object)&#10;ML backbone" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1480" y="695" width="250" height="60" as="geometry"/></mxCell>
+    <mxCell id="s3_t" value="📘1.9 Object storage · 📗2.2 checkpoints · big files (never DB)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="1480" y="760" width="250" height="45" as="geometry"/></mxCell>
+    <mxCell id="efsebs" value="📁 EFS / 💽 EBS&#10;shared / per-node" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1950" y="695" width="250" height="60" as="geometry"/></mxCell>
+    <mxCell id="efsebs_t" value="📘1.9 File/Block · 🛠️5B PV/PVC→EBS/EFS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#bbb;fontSize=10;fontStyle=2;" vertex="1" parent="1"><mxGeometry x="1950" y="760" width="250" height="45" as="geometry"/></mxCell>
+
+    <!-- ===== BAND 4: OBSERVABILITY ===== -->
+    <mxCell id="band4" value="④ OBSERVABILITY — uptime kaafi nahi, prediction quality track  [📕4.1 Monitoring · 4.2 Drift]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3edf7;strokeColor=#9673a6;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="845" width="1560" height="150" as="geometry"/>
+    </mxCell>
+    <mxCell id="infra" value="L1 INFRA&#10;GPU util, latency&#10;(Prometheus/CW)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="70" y="895" width="340" height="85" as="geometry"/></mxCell>
+    <mxCell id="modelperf" value="L2 MODEL PERF&#10;accuracy, pred-dist&#10;⚠️silent degradation&#10;(actuals delayed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="450" y="895" width="340" height="85" as="geometry"/></mxCell>
+    <mxCell id="dataq" value="L3 DATA QUALITY&#10;input dist shift?&#10;(data drift signal)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="830" y="895" width="340" height="85" as="geometry"/></mxCell>
+    <mxCell id="traces" value="TRACES (pillar 3)&#10;request journey&#10;OTel / X-Ray&#10;[🛠️5H X-Ray]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1210" y="895" width="340" height="85" as="geometry"/></mxCell>
+
+    <!-- ===== BAND 5: MLOPS LOOP ===== -->
+    <mxCell id="band5" value="⑤ MLOps LOOP — drift=monitoring OUTPUT (not stage) · registry BEFORE deploy  [📗2.5 Pipeline · 2.6 Deploy · 📕4.6 CI/CD/CT · 🛠️5F GitOps]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdf0e6;strokeColor=#d79b00;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="1020" width="2420" height="150" as="geometry"/>
+    </mxCell>
+    <mxCell id="drift" value="🚨 Drift Detect&#10;P(X) vs P(Y|X)&#10;⚠️seasonality≠drift" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1"><mxGeometry x="70" y="1070" width="270" height="80" as="geometry"/></mxCell>
+    <mxCell id="train2" value="⚙️ Retrain&#10;(drift trigger)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1"><mxGeometry x="510" y="1070" width="270" height="80" as="geometry"/></mxCell>
+    <mxCell id="eval" value="✅ Evaluate (GATE)&#10;baseline se accha?&#10;nahi→reject" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1"><mxGeometry x="950" y="1070" width="270" height="80" as="geometry"/></mxCell>
+    <mxCell id="registry" value="📚 Registry&#10;champion/challenger&#10;(BEFORE deploy)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1390" y="1070" width="270" height="80" as="geometry"/></mxCell>
+    <mxCell id="deploy" value="🚀 Deploy&#10;canary/blue-green/&#10;shadow [📗2.6]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1"><mxGeometry x="1830" y="1070" width="270" height="80" as="geometry"/></mxCell>
+
+    <!-- ===== BAND 6: TRAINING + SQS ===== -->
+    <mxCell id="band6" value="⑥ TRAINING (offline) + ASYNC  [📗2.1 train vs inference · 2.2 parallelism/checkpoint/spot · 📘1.7 Queues]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fde8e8;strokeColor=#b85450;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="1195" width="2420" height="140" as="geometry"/>
+    </mxCell>
+    <mxCell id="trainflow" value="🔴 TRAINING FLOW:  Data(S3) → Distributed train (data/tensor/pipeline parallel · NVLink+InfiniBand) → Checkpoints→S3 (spot-safe) → MLflow → Registry → deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="70" y="1245" width="1560" height="70" as="geometry"/></mxCell>
+    <mxCell id="sqs" value="📥 SQS/Kafka (async)&#10;decouple · load-smoothing · reliability&#10;[📘1.7 · 🛠️5D KEDA scale-on-queue]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="1670" y="1245" width="430" height="70" as="geometry"/></mxCell>
+
+    <!-- ===== CROSS-CUTTING (applies everywhere) ===== -->
+    <mxCell id="xcut" value="⊕ CROSS-CUTTING (poore system pe lagte — kisi ek box me nahi)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6e6fa;strokeColor=#7a7ac0;fontSize=14;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+      <mxGeometry x="40" y="1360" width="2420" height="200" as="geometry"/>
+    </mxCell>
+    <mxCell id="xc1" value="📘1.3 HA/Availability&#10;📕4.4 HA &amp; DR (RTO/RPO)&#10;🛠️5I DR patterns&#10;(pilot-light/warm/active-active)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0fb;strokeColor=#7a7ac0;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="70" y="1405" width="450" height="140" as="geometry"/></mxCell>
+    <mxCell id="xc2" value="📕4.5 Cost/FinOps (spot, right-size, tag)&#10;📕4.7 Bottleneck analysis&#10;📘1.1 Scalability decisions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0fb;strokeColor=#7a7ac0;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="550" y="1405" width="450" height="140" as="geometry"/></mxCell>
+    <mxCell id="xc3" value="🛠️5G IaC (Terraform/CDK)&#10;🛠️5F CI/CD + GitOps (ArgoCD)&#10;🛠️5A Containers (Docker/ECR)&#10;🛠️5B K8s core (deploy/svc/RBAC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0fb;strokeColor=#7a7ac0;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="1030" y="1405" width="500" height="140" as="geometry"/></mxCell>
+    <mxCell id="xc4" value="📔7 INTERVIEW SKILLS (poore design pe)&#10;7.1 Framework · 7.2 Estimation&#10;7.3 Trade-off articulation&#10;7.4 Structure · 7.5 MOCKS ⭐⭐" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0fb;strokeColor=#7a7ac0;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="1560" y="1405" width="500" height="140" as="geometry"/></mxCell>
+    <mxCell id="xc5" value="📓6 CASE STUDIES&#10;(ye poora flow = 6.1 LLM Serving)&#10;6.2 RAG · 6.3 MLOps&#10;6.4 Fraud · 6.5 Router · 6.6 Training" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0fb;strokeColor=#7a7ac0;fontSize=11;align=left;spacingLeft=8;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="2090" y="1405" width="350" height="140" as="geometry"/></mxCell>
+
+    <!-- ===== FLOW EDGES ===== -->
+    <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="users" target="cf"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="cf" target="waf"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="waf" target="apigw"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="apigw" target="guard"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeWidth=2;strokeColor=#232f3e;" edge="1" parent="1" source="guard" target="alb"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#e65100;strokeWidth=2;" edge="1" parent="1" source="alb" target="nodeA1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#e65100;strokeWidth=2;" edge="1" parent="1" source="alb" target="nodeB1"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e9" value="RAG retrieve" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#82b366;dashed=1;fontSize=10;" edge="1" parent="1" source="nodeA1" target="vectordb"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e10" value="model load" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#82b366;dashed=1;fontSize=10;" edge="1" parent="1" source="nodeB1" target="s3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e11" value="metrics" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#9673a6;dashed=1;fontSize=10;" edge="1" parent="1" source="nodeA2" target="infra"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e12" value="drift signal" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;dashed=1;fontSize=10;" edge="1" parent="1" source="modelperf" target="drift"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1" source="drift" target="train2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1" source="train2" target="eval"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1" source="eval" target="registry"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#d79b00;strokeWidth=2;" edge="1" parent="1" source="registry" target="deploy"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="e18" value="register" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;strokeColor=#b85450;dashed=1;fontSize=10;" edge="1" parent="1" source="trainflow" target="registry"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+  </root>
+</mxGraphModel>
