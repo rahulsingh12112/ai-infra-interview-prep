@@ -81,3 +81,98 @@ AWS role me Bedrock jaanna zaroori. Bedrock = managed foundation models (Claude,
 **Q: Managed (Bedrock) vs self-host (vLLM)?** — "Managed = fast, less ops, cost/control trade-off. Self-host = cheaper at scale, full control, ops burden. Scale + team + control pe depend."
 
 **Q: Agents scale pe challenge?** — "Multiple LLM+tool calls, latency/cost multiply, non-deterministic. Max-iteration bounds, parallel tools, state mgmt, tracing, cost controls."
+
+---
+
+## 🎓 Deep Dive & Q&A (Teacher Session — zero-se-expert)
+
+> Target-role ka dil. LS/LangChain/RAG-repo se overlap; yahan system-design angle + structure discipline.
+
+### Section 1 — LLM Serving: Kya Special
+
+Normal ML = chhota (MBs), simple. LLM = bada (GBs) + token-by-token. **Challenges (formula: label — kya + kaise):**
+1. **Size/Memory** — LLM GBs (7B=14GB, 70B=140GB), ek GPU me fit nahi → multi-GPU sharding (tensor parallel).
+2. **Latency/Throughput** — token-by-token slow → **streaming** (perceived latency); mehenga GPU idle na rahe → **batching** (throughput).
+3. **Cost** — per-token compute, scale pe bill bada → optimization.
+Specialized engines: vLLM, TensorRT-LLM, TGI (normal Flask nahi).
+
+**Networking:** high-bandwidth mehenga link optimize — VRAM (capacity), batching (multiplexing), streaming (progressive delivery), metered cost.
+
+**Interview one-liner:**
+> "LLM serving unique: huge model (VRAM/multi-GPU), token-by-token (streaming), expensive GPU (batching), per-token cost. Specialized engines (vLLM/TGI)."
+
+### Section 2 — vLLM Internals (2 innovations)
+
+**Problem base:** KV cache (generated tokens ka state) + GPU idle na rahe.
+
+1. **PagedAttention** — **KV cache** ko OS virtual-memory paging jaisa **fixed pages** me manage. Purana: continuous bada block pehle se reserve (max length) → jawab chhota → waste/fragmentation. Paging: zaroorat pe page allocate → waste kam → zyada concurrency. (≈ packet buffer / MTU-sized chunks.)
+2. **Continuous batching** (in-flight) — static batching me ek lamba **request** poore batch ko rokta (baaki slots idle wait). Continuous: slot khaali hote hi naya request add → GPU **never idle** → high throughput. (≈ statistical multiplexing.)
+
+**Result:** 10-24x throughput vs naive.
+
+**⚠️ Term precision:** PagedAttention = **KV cache** manage (not whole VRAM). Continuous batching me lamba **request** (not model) rokta hai.
+
+**Interview one-liner:**
+> "vLLM: (1) PagedAttention — KV cache OS-paging jaisa, memory-efficient, more concurrency. (2) Continuous batching — dynamic add/remove requests, GPU never idle. 10-24x throughput. Packet-buffer + statistical-multiplexing jaisa."
+
+**Q&A:** 2 innovations — PagedAttention (KV cache paging, waste kam) + continuous batching (slot khaali → naya request, GPU idle nahi).
+
+### Section 3 — LLM Inference Optimization (7 levers)
+
+Interviewer "latency/cost/throughput kaise optimize" → yeh list:
+1. **Quantization** — precision↓ (FP16/INT8/INT4): VRAM + cost + speed down, accuracy thodi kam. (Not fit-only — cost+speed bhi.)
+2. **Batching** — requests ek saath → throughput↑ (continuous batching = vLLM).
+3. **KV caching** — generated tokens reuse (no full recompute).
+4. **Model parallelism/sharding** — bada model multi-GPU (tensor parallel).
+5. **Speculative decoding** — chhota fast model kai token guess, bada model ek saath verify → sahi to multi-x speedup, final output bada model ka (**no accuracy loss**).
+6. **Prompt caching** — repeated prompt prefix (same system prompt) ka KV reuse.
+7. **Distillation** — chhota student model bade teacher se train → fast/sasta serving, lagbhag same quality.
+
+**Trade-off:** zyadatar = speed/cost down, accuracy thodi down (quantization, distillation). Architect ko pata ho kitni accuracy chhod sakte.
+
+**Interview one-liner:**
+> "LLM optimization: quantization (cost/VRAM↓), batching (throughput), KV caching, tensor parallelism (big model), speculative decoding (small drafts + big verifies, speedup no accuracy loss), prompt caching (prefix reuse), distillation (small student). Trade-off: speed/cost vs accuracy."
+
+**Q&A:** 3 techniques example — quantization (precision↓, cost+speed+VRAM), speculative decoding (small guesses, big verifies, multi-x, no accuracy loss), distillation (student from teacher, fast/cheap).
+
+### Section 4 — RAG Architecture at Scale
+
+**RAG:** LLM ko relevant docs retrieve karke context me dena (open-book exam) — fresh/private data bina retrain.
+
+**2 phases:**
+1. **Ingestion (offline, periodic):** Documents → Chunk → Embed (vector) → Vector DB store. (Index banana.)
+2. **Query (online, per request):** Query → Embed → Retrieve top-k (vector DB) → Rerank → assemble context in prompt → LLM → Answer. (Fast lookup + generate.)
+
+**System-design considerations:** vector DB choice (OpenSearch/Pinecone/pgvector), embedding model (self-host vs Titan), chunking (size+overlap — quality), reranking, caching (semantic), latency budget (embed+retrieve+LLM).
+
+**Scale pe:** ingestion async (queue), vector DB sharded/replicated, LLM autoscaled (vLLM), aggressive semantic caching.
+
+**Networking:** multi-stage lookup pipeline — ingestion = route-table populate (index), query = fast lookup + forward (retrieve + generate).
+
+**Interview one-liner:**
+> "RAG = LLM + retrieved external docs (fresh/private, no retrain). Offline ingestion (chunk→embed→vector DB) + online query (embed→retrieve→rerank→assemble→LLM). Scale: async ingestion, sharded vector DB, autoscaled LLM, semantic caching. Latency = embed+retrieve+LLM."
+
+**Q&A:** 2 phases — Ingestion (docs→chunk→embed→vector DB store, offline) + Query (query→embed→retrieve top-k→rerank→context→LLM→answer, online).
+
+### Section 5 — Agents at Scale
+
+**Agent:** LLM + tools + reasoning loop (ReAct — LLM sochta → tool call → result → phir sochta... jab tak answer). 
+
+**Scale challenge:** ek agent request = **multiple LLM calls + multiple tool calls** (not 1):
+- Latency multiply (5-10x), Cost multiply, **Non-deterministic** (steps unknown — 2 ya 15).
+
+**⭐ #1 RISK = uncontrolled/infinite loop** (agent phasa, steps khatam nahi) → cost+latency blast.
+
+**Controls:**
+1. **Max-iteration bound (#1 control)** — max steps (10), phir force stop. = packet **TTL** (har hop count, limit pe drop — loop rokna).
+2. **Tool execution** — parallel jahan possible, timeout, error handling.
+3. **State management** — conversation/memory in Redis (per-session).
+4. **Observability** — per-step tracing (non-deterministic → debug mushkil). = traceroute.
+5. **Cost controls** — per-request budget + model tiering (simple=chhota model, complex=bada).
+
+**Networking:** agent loop = multi-hop routing with per-hop decisions. Bound hops = TTL, trace path = traceroute, cost/latency multiply with hops.
+
+**Interview one-liner:**
+> "Agents = multiple LLM+tool calls/request → latency/cost multiply, non-deterministic. #1 risk = runaway loop → #1 control max-iterations (= TTL). Plus parallel tools+timeout, Redis state, per-step tracing, cost budget + model tiering. Multi-hop routing jaisa."
+
+**Q&A:** #1 risk = runaway/infinite loop; #1 control = max-iteration bound (= packet TTL — har step count, limit pe stop). Plus budget + model tiering.
